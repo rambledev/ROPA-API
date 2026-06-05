@@ -14,6 +14,7 @@
     "@elysiajs/bearer": "^1.4.4",
     "@elysiajs/cors": "^1.4.2",
     "@elysiajs/jwt": "^1.4.2",
+    "@elysiajs/swagger": "^1.3.1",
     "@sinclair/typebox": "^0.34.49",
     "argon2": "^0.44.0",
     "drizzle-orm": "^0.45.2",
@@ -21,5 +22,14 @@
     "jose": "^6.2.3",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run seed.ts",
+    "typecheck": "tsc --noEmit"
   }
 }
