@@ -80,3 +80,12 @@ export const ropaActivitiesRelations = relations(ropaActivities, ({ one, many })
   approvals:  many(approvals),
   dpia:       many(dpiaAssessments),
 }))
+
+export const ropaSectionsRelations = relations(ropaSections, ({ one }) => ({
+  activity: one(ropaActivities, { fields: [ropaSections.activityId], references: [ropaActivities.id] }),
+}))
+
+export const approvalsRelations = relations(approvals, ({ one }) => ({
+  activity: one(ropaActivities, { fields: [approvals.activityId], references: [ropaActivities.id] }),
+  approver: one(users,          { fields: [approvals.approverId],  references: [users.id] }),
+}))

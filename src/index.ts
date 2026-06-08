@@ -2,6 +2,7 @@ import { Elysia } from "elysia"
 import { cors } from "@elysiajs/cors"
 import { swagger } from "@elysiajs/swagger"
 import { authRoutes } from "@/modules/auth"
+import { ropaRoutes } from "@/modules/ropa"
 
 const requiredEnvs = ["DATABASE_URL", "CORS_ORIGIN", "PORT", "JWT_PRIVATE_KEY", "JWT_PUBLIC_KEY", "ENCRYPTION_KEY"] as const
 for (const key of requiredEnvs) {
@@ -20,17 +21,13 @@ const app = new Elysia()
   .use(swagger({
     documentation: {
       info: {
-        title:   "ROPA API — มหาวิทยาลัยราชภัฏมหาสารคาม",
-        version: "1.0.0",
+        title:       "ROPA API — มหาวิทยาลัยราชภัฏมหาสารคาม",
+        version:     "1.0.0",
         description: "ระบบบันทึกกิจกรรมการประมวลผลข้อมูลส่วนบุคคล (PDPA)",
       },
       components: {
         securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
-          },
+          bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
         },
       },
     },
@@ -41,12 +38,10 @@ const app = new Elysia()
     timestamp: new Date().toISOString(),
     env:       process.env.NODE_ENV,
   }), {
-    detail: {
-      summary: "Health Check",
-      tags:    ["System"],
-    }
+    detail: { summary: "Health Check", tags: ["System"] }
   })
   .use(authRoutes)
+  .use(ropaRoutes)
   .listen(process.env.PORT ?? 3001)
 
 console.log(`ROPA API running at http://localhost:${app.server?.port}`)
