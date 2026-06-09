@@ -9,14 +9,14 @@ import type { Role } from "@/types/roles"
 const getPublicKey = async (): Promise<CryptoKey> => {
   const publicKeyPem = process.env.JWT_PUBLIC_KEY
   if (!publicKeyPem) throw new Error("JWT_PUBLIC_KEY is not set")
-  const pem = publicKeyPem.replace(/\\n/g, "\n")
+  const pem = publicKeyPem.replace(/\\\\n/g, "\n").replace(/\\n/g, "\n")
   return jose.importSPKI(pem, "RS256") as Promise<CryptoKey>
 }
 
 export const getPrivateKey = async (): Promise<CryptoKey> => {
   const privateKeyPem = process.env.JWT_PRIVATE_KEY
   if (!privateKeyPem) throw new Error("JWT_PRIVATE_KEY is not set")
-  const pem = privateKeyPem.replace(/\\n/g, "\n")
+  const pem = privateKeyPem.replace(/\\\\n/g, "\n").replace(/\\n/g, "\n")
   return jose.importPKCS8(pem, "RS256") as Promise<CryptoKey>
 }
 
