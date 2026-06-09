@@ -10,10 +10,11 @@ for (const key of requiredEnvs) {
 }
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN as string
+const CORS_ORIGINS = CORS_ORIGIN.split(",").map(o => o.trim())
 
 const app = new Elysia()
   .use(cors({
-    origin:         CORS_ORIGIN,
+    origin:         CORS_ORIGINS,
     methods:        ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials:    true,
