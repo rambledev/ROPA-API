@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia"
 import { authMiddleware } from "@/middleware/auth"
 import { loginService, refreshTokenService, logoutService } from "./auth.service"
+import { googleAuthService } from "./google.service"
 
 export const authRoutes = new Elysia({ prefix: "/auth" })
   .post("/login",
@@ -31,6 +32,20 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       }
     },
     { body: t.Object({ refreshToken: t.String() }) }
+  )
+  .post("/google",
+    async ({ body, set }) => {
+      try {
+        const { email, name, image, googleId, isAdmin } = body as {
+          email: string; name: string; image?: string; googleId: string; isAdmin: boolean
+        }
+        const data = await googleAuthService({ email, name, image, googleId, isAdmin })
+        return { success: true, data }
+      } catch (err) {
+        set.status = 500
+        return { success: false, message: err instanceof Error ? err.message : "Error" }
+      }
+    }
   )
   .use(authMiddleware)
   .post("/logout",
