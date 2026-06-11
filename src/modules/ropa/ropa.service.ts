@@ -196,7 +196,7 @@ export const submitRopa = async (activityId: string, userId: string, ipAddress: 
     throw new Error("Only draft or revision ROPA can be submitted")
   }
 
-  const requiredSections = [2, 3, 4, 5]
+  const requiredSections = [2, 3, 4, 5, 6, 7, 10, 11]
   const savedSections = activity.sections.map(s => s.sectionNumber)
   const missingSections = requiredSections.filter(s => !savedSections.includes(s))
   if (missingSections.length > 0) {

@@ -37,7 +37,7 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
     }
   }, {
     body: t.Object({
-      title:         t.String({ minLength: 5 }),
+      title:         t.String({ minLength: 2 }),
       ownerPosition: t.Optional(t.String()),
       ownerPhone:    t.Optional(t.String()),
       ownerEmail:    t.Optional(t.String({ format: "email" })),
@@ -64,7 +64,7 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
       const ipAddress = headers["x-forwarded-for"] ?? "unknown"
       const sectionNumber = parseInt(params.sectionNumber) as SectionNumber
 
-      if (sectionNumber < 2 || sectionNumber > 12) {
+      if (sectionNumber < 1 || sectionNumber > 13) {
         set.status = 400
         return { success: false, message: "Section number must be 2-12" }
       }
