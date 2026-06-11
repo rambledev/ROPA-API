@@ -30,7 +30,7 @@ export const signAccessToken = async (payload: {
   return new jose.SignJWT({ ...payload })
     .setProtectedHeader({ alg: "RS256" })
     .setIssuedAt()
-    .setExpirationTime("15m")
+    .setExpirationTime("8h")
     .setIssuer("ropa-api.rmu.ac.th")
     .setAudience("ropa.rmu.ac.th")
     .sign(privateKey)
