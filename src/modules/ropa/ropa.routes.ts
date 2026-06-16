@@ -37,7 +37,7 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
     }
   }, {
     body: t.Object({
-      title:         t.String({ minLength: 2 }),
+      title:         t.String({ minLength: 10 }),
       ownerPosition: t.Optional(t.String()),
       ownerPhone:    t.Optional(t.String()),
       ownerEmail:    t.Optional(t.String({ format: "email" })),

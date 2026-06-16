@@ -4,7 +4,7 @@ import { z } from "zod"
 
 // ส่วนที่ 1 — ข้อมูลทั่วไป (validate ตอนสร้าง ROPA)
 export const createRopaSchema = z.object({
-  title:         z.string().min(2).max(300),
+  title:         z.string().min(10).max(300),
   ownerPosition: z.string().max(200).optional(),
   ownerPhone:    z.string().max(20).optional(),
   ownerEmail:    z.string().email().optional(),
