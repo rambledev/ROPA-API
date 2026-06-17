@@ -1,15 +1,9 @@
-import puppeteer from "puppeteer-core"
-import chromium from "@sparticuz/chromium"
+import puppeteer from "puppeteer"
 
 export const generateRopaPDF = async (html: string): Promise<Buffer> => {
-  const isLocal = process.env.NODE_ENV !== "production"
-
   const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
-    args: isLocal ? [] : chromium.args,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
     headless: true,
-    executablePath: isLocal
-      ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-      : await chromium.executablePath(),
   }
   const browser = await puppeteer.launch(launchOptions)
 

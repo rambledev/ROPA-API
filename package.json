@@ -24,6 +24,7 @@
     "elysia": "^1.4.28",
     "jose": "^6.2.3",
     "postgres": "^3.4.9",
+    "puppeteer": "^25.1.0",
     "puppeteer-core": "^25.1.0",
     "zod": "^4.4.3"
   },
