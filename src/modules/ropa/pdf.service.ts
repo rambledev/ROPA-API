@@ -1,11 +1,14 @@
 import puppeteer from "puppeteer"
 
 export const generateRopaPDF = async (html: string): Promise<Buffer> => {
+  console.log("[PDF] Starting PDF generation...")
   const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
     headless: true,
   }
+  console.log("[PDF] Launching browser...")
   const browser = await puppeteer.launch(launchOptions)
+  console.log("[PDF] Browser launched!")
 
   const page = await browser.newPage()
   await page.setContent(html, { waitUntil: "load" })
@@ -17,6 +20,7 @@ export const generateRopaPDF = async (html: string): Promise<Buffer> => {
   })
 
   await browser.close()
+  console.log("[PDF] PDF generated, size:", pdf.length)
   return Buffer.from(pdf)
 }
 
