@@ -8,6 +8,11 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1.1.38-alpine AS production
 WORKDIR /app
 
+RUN apk add --no-cache     chromium     nss     freetype     harfbuzz     ca-certificates     ttf-freefont     font-noto     font-noto-thai
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 RUN addgroup -S ropa && adduser -S ropa -G ropa
 
 COPY --from=deps /app/node_modules ./node_modules

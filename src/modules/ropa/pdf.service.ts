@@ -2,9 +2,11 @@ import puppeteer from "puppeteer"
 
 export const generateRopaPDF = async (html: string): Promise<Buffer> => {
   console.log("[PDF] Starting PDF generation...")
+  const execPath = process.env.PUPPETEER_EXECUTABLE_PATH
   const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
     headless: true,
+    ...(execPath ? { executablePath: execPath } : {}),
   }
   console.log("[PDF] Launching browser...")
   const browser = await puppeteer.launch(launchOptions)
