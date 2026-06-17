@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia"
 import { requireUser, requireAdmin } from "@/middleware/rbac"
 import { createRopa, getMyRopa, getRopaById, saveSection, submitRopa } from "./ropa.service"
+import { generateRopaPDF, buildRopaHTML } from "./pdf.service"
 import type { SectionNumber } from "./ropa.types"
 
 export const ropaRoutes = new Elysia({ prefix: "/ropa" })
@@ -85,6 +86,31 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
     body: t.Record(t.String(), t.Unknown()),
     detail: { summary: "บันทึกข้อมูลแต่ละส่วน (2-12)", tags: ["ROPA"] }
   })
+
+  // ── GET /ropa/:id/pdf — Export PDF ────────────────────
+  .get("/:id/pdf", async ({ user, params, set }) => {
+    try {
+      const data = await getRopaById(params.id, user.id)
+      const html = buildRopaHTML({
+        ropaId:    data.ropaId,
+        title:     data.title,
+        status:    data.status,
+        createdAt: data.createdAt.toISOString(),
+        sections:  data.sections.map(s => ({
+          sectionNumber: s.sectionNumber,
+          data:          s.data as Record<string, unknown>,
+          updatedAt:     s.updatedAt.toISOString(),
+        })),
+      })
+      const pdf = await generateRopaPDF(html)
+      set.headers["Content-Type"] = "application/pdf"
+      set.headers["Content-Disposition"] = `attachment; filename="${data.ropaId}.pdf"`
+      return pdf
+    } catch (err) {
+      set.status = 500
+      return { success: false, message: err instanceof Error ? err.message : "Error" }
+    }
+  }, { detail: { summary: "Export PDF", tags: ["ROPA"] } })
 
   // ── POST /ropa/:id/submit — ส่งขออนุมัติ ──────────────
   .post("/:id/submit", async ({ user, params, headers, set }) => {

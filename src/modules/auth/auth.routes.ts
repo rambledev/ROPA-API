@@ -39,7 +39,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
         const { email, name, image, googleId, isAdmin } = body as {
           email: string; name: string; image?: string; googleId: string; isAdmin: boolean
         }
-        const data = await googleAuthService({ email, name, image, googleId, isAdmin })
+        const data = await googleAuthService({ email, name, ...(image ? { image } : {}), googleId, isAdmin })
         return { success: true, data }
       } catch (err) {
         set.status = 500
