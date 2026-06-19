@@ -3,6 +3,7 @@ import { cors } from "@elysiajs/cors"
 import { swagger } from "@elysiajs/swagger"
 import { authRoutes } from "@/modules/auth"
 import { ropaRoutes, adminRopaRoutes } from "@/modules/ropa"
+import { cioRoutes } from "@/modules/cio"
 
 const requiredEnvs = ["DATABASE_URL", "CORS_ORIGIN", "PORT", "JWT_PRIVATE_KEY", "JWT_PUBLIC_KEY", "ENCRYPTION_KEY"] as const
 for (const key of requiredEnvs) {
@@ -44,6 +45,7 @@ const app = new Elysia()
   .use(authRoutes)
   .use(ropaRoutes)
   .use(adminRopaRoutes)
+  .use(cioRoutes)
   .listen(process.env.PORT ?? 3001)
 
 console.log(`ROPA API running at http://localhost:${app.server?.port}`)
