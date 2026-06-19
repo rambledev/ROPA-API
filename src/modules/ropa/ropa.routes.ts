@@ -75,7 +75,8 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
         sectionNumber,
         body,
         user.id,
-        ipAddress
+        ipAddress,
+        user.role === "cio"
       )
       return { success: true, data }
     } catch (err) {
@@ -91,7 +92,7 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
   .patch("/:id", async ({ user, params, body, headers, set }) => {
     try {
       const ipAddress = headers["x-forwarded-for"] ?? "unknown"
-      const data = await updateRopaInfo(params.id, user.id, body, ipAddress)
+      const data = await updateRopaInfo(params.id, user.id, body, ipAddress, user.role === "cio")
       return { success: true, data }
     } catch (err) {
       set.status = 400
@@ -111,7 +112,7 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
   .delete("/:id", async ({ user, params, headers, set }) => {
     try {
       const ipAddress = headers["x-forwarded-for"] ?? "unknown"
-      const data = await deleteRopa(params.id, user.id, ipAddress)
+      const data = await deleteRopa(params.id, user.id, ipAddress, user.role === "cio")
       return { success: true, data }
     } catch (err) {
       set.status = 400

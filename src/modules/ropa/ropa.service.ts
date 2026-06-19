@@ -129,8 +129,17 @@ export const saveSection = async (
   sectionNumber: SectionNumber,
   data: unknown,
   userId: string,
-  ipAddress: string
+  ipAddress: string,
+  isCio: boolean = false
 ) => {
+  // ตรวจสอบสิทธิ์: เจ้าของ หรือ CIO เท่านั้น
+  const ownerCheck = await db.query.ropaActivities.findFirst({
+    where: isCio
+      ? eq(ropaActivities.id, activityId)
+      : and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
+  })
+  if (!ownerCheck) throw new Error("ROPA not found or not owned by you")
+
   const schema = sectionSchemas[sectionNumber]
   const validated = schema.parse(data)
 
@@ -185,9 +194,11 @@ export const saveSection = async (
 }
 
 // ── Submit ROPA ───────────────────────────────────────────
-export const deleteRopa = async (activityId: string, userId: string, ipAddress: string) => {
+export const deleteRopa = async (activityId: string, userId: string, ipAddress: string, isCio: boolean = false) => {
   const activity = await db.query.ropaActivities.findFirst({
-    where: and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
+    where: isCio
+      ? eq(ropaActivities.id, activityId)
+      : and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
   })
 
   if (!activity) throw new Error("ROPA not found or not owned by you")
@@ -214,10 +225,13 @@ export const updateRopaInfo = async (
   activityId: string,
   userId: string,
   data: { title?: string; ownerPosition?: string; ownerPhone?: string; ownerEmail?: string },
-  ipAddress: string
+  ipAddress: string,
+  isCio: boolean = false
 ) => {
   const activity = await db.query.ropaActivities.findFirst({
-    where: and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
+    where: isCio
+      ? eq(ropaActivities.id, activityId)
+      : and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
   })
 
   if (!activity) throw new Error("ROPA not found or not owned by you")
