@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia"
 import { requireUser, requireAdmin } from "@/middleware/rbac"
-import { createRopa, getMyRopa, getRopaById, saveSection, submitRopa } from "./ropa.service"
+import { createRopa, getMyRopa, getRopaById, saveSection, submitRopa, deleteRopa, updateRopaInfo } from "./ropa.service"
 import { generateRopaPDF, buildRopaHTML } from "./pdf.service"
 import type { SectionNumber } from "./ropa.types"
 
@@ -86,6 +86,38 @@ export const ropaRoutes = new Elysia({ prefix: "/ropa" })
     body: t.Record(t.String(), t.Unknown()),
     detail: { summary: "บันทึกข้อมูลแต่ละส่วน (2-12)", tags: ["ROPA"] }
   })
+
+  // ── PATCH /ropa/:id — แก้ไขข้อมูลทั่วไป ────────────────
+  .patch("/:id", async ({ user, params, body, headers, set }) => {
+    try {
+      const ipAddress = headers["x-forwarded-for"] ?? "unknown"
+      const data = await updateRopaInfo(params.id, user.id, body, ipAddress)
+      return { success: true, data }
+    } catch (err) {
+      set.status = 400
+      return { success: false, message: err instanceof Error ? err.message : "Error" }
+    }
+  }, {
+    body: t.Object({
+      title:         t.Optional(t.String({ minLength: 10 })),
+      ownerPosition: t.Optional(t.String()),
+      ownerPhone:    t.Optional(t.String()),
+      ownerEmail:    t.Optional(t.String({ format: "email" })),
+    }),
+    detail: { summary: "แก้ไขข้อมูลทั่วไป ROPA", tags: ["ROPA"] }
+  })
+
+  // ── DELETE /ropa/:id — ลบ ROPA ─────────────────────────
+  .delete("/:id", async ({ user, params, headers, set }) => {
+    try {
+      const ipAddress = headers["x-forwarded-for"] ?? "unknown"
+      const data = await deleteRopa(params.id, user.id, ipAddress)
+      return { success: true, data }
+    } catch (err) {
+      set.status = 400
+      return { success: false, message: err instanceof Error ? err.message : "Error" }
+    }
+  }, { detail: { summary: "ลบ ROPA", tags: ["ROPA"] } })
 
   // ── GET /ropa/:id/pdf — Export PDF ────────────────────
   .get("/:id/pdf", async ({ user, params, set }) => {

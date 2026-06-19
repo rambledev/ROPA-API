@@ -185,6 +185,69 @@ export const saveSection = async (
 }
 
 // ── Submit ROPA ───────────────────────────────────────────
+export const deleteRopa = async (activityId: string, userId: string, ipAddress: string) => {
+  const activity = await db.query.ropaActivities.findFirst({
+    where: and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
+  })
+
+  if (!activity) throw new Error("ROPA not found or not owned by you")
+  if (activity.status !== "draft" && activity.status !== "revision") {
+    throw new Error("Only draft or revision ROPA can be deleted")
+  }
+
+  await db.delete(ropaSections).where(eq(ropaSections.activityId, activityId))
+  await db.delete(ropaActivities).where(eq(ropaActivities.id, activityId))
+
+  await db.insert(auditLogs).values({
+    userId,
+    action: "delete_ropa",
+    resource: "ropa_activity",
+    resourceId: activityId,
+    ipAddress,
+    metadata: { ropaId: activity.ropaId },
+  })
+
+  return { success: true }
+}
+
+export const updateRopaInfo = async (
+  activityId: string,
+  userId: string,
+  data: { title?: string; ownerPosition?: string; ownerPhone?: string; ownerEmail?: string },
+  ipAddress: string
+) => {
+  const activity = await db.query.ropaActivities.findFirst({
+    where: and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
+  })
+
+  if (!activity) throw new Error("ROPA not found or not owned by you")
+  if (activity.status !== "draft" && activity.status !== "revision") {
+    throw new Error("Only draft or revision ROPA can be edited")
+  }
+
+  const updateData: Record<string, unknown> = { updatedAt: new Date() }
+  if (data.title !== undefined) updateData.title = data.title
+  if (data.ownerPosition !== undefined) updateData.ownerPosition = data.ownerPosition
+  if (data.ownerPhone !== undefined) updateData.ownerPhone = data.ownerPhone
+  if (data.ownerEmail !== undefined) updateData.ownerEmail = data.ownerEmail
+
+  const [updated] = await db.update(ropaActivities)
+    .set(updateData)
+    .where(eq(ropaActivities.id, activityId))
+    .returning()
+
+  await db.insert(auditLogs).values({
+    userId,
+    action: "update_ropa_info",
+    resource: "ropa_activity",
+    resourceId: activityId,
+    ipAddress,
+    metadata: data,
+  })
+
+  return updated
+}
+
 export const submitRopa = async (activityId: string, userId: string, ipAddress: string) => {
   const activity = await db.query.ropaActivities.findFirst({
     where: and(eq(ropaActivities.id, activityId), eq(ropaActivities.ownerId, userId)),
